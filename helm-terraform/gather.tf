@@ -29,3 +29,18 @@ data "aws_ssm_parameter" "dbpwd" {
   name = "/rds/encoded/dbpwd"
   provider = aws
 }
+
+data "aws_ssm_parameter" "clustername" {
+  name = "/ekscluster/name"
+  provider = aws
+}
+
+data "aws_ssm_parameter" "clusterendpoint" {
+  name = "/ekscluster/host"
+  provider = aws
+}
+
+data "aws_ssm_parameter" "clustercacert" {
+  name = "/ekscluster/cacert"
+  provider = aws
+}
