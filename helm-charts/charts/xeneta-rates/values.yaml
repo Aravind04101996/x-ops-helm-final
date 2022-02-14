@@ -6,6 +6,18 @@ secrets:
 
 nameSpace:
   name: my-namespace
+  defMem: "512Mi"
+  defCpu: "500m"
+  defReqMem: "256Mi" 
+  defReqCpu: "300m"
+  rQ:
+    reqCpu: "1"
+    reqMem: 1Gi
+    limCpu: "2"
+    limMem: 2Gi
+    pods: "5"
+    secrets: "10"
+    services: "10"
 
 nodeService:
   name: my-service
@@ -23,6 +35,12 @@ deployment:
   dbUser: xeneta
   dbName: xeneta
   replicas: 1
+  probe:
+    delay: 60
+    interval: 20
+    timeout: 10
+    failthreshold: 3
+    successthreshold: 3
 
 ingress:
   name: my-ingress
@@ -41,4 +59,3 @@ ingress:
   hchthreshold: '3'
   hcuhthreshold: '3'
   successCode: '200'
-

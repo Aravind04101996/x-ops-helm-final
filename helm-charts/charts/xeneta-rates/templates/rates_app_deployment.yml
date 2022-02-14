@@ -5,6 +5,44 @@ metadata:
   labels:
     app: rates
 ---
+# Define Limit Range for Namespace (LimitRange sets resource usage limits for each kind of resource in a Namespace)
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Values.nameSpace.name}}
+  labels:
+    app: rates
+  namespace: {{ .Values.nameSpace.name}}
+spec:
+  limits:
+    - type: Container #  Limit that applies to all containers in a namespace
+      default:
+        memory: {{ .Values.nameSpace.defMem}} # If not specified the Container's memory limit is set to 512Mi, which is the default memory limit for the namespace.
+        cpu: {{ .Values.nameSpace.defCpu }}   # # If not specified default limit is 1 vCPU per container 
+      defaultRequest:
+        memory: {{ .Values.nameSpace.defReqMem}} # # If not specified default it will take from whatever specified in limits.default.memory
+        cpu: {{ .Values.nameSpace.defReqCpu }}  # If not specified default it will take from whatever specified in limits.default.cpu
+---
+# Define Resource Quota - ResourceQuota sets aggregate quota restrictions enforced per namespace
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Values.nameSpace.name}}
+  labels:
+    app: rates
+  namespace: {{ .Values.nameSpace.name}}
+spec:
+  hard: # Hard Limit
+     requests.cpu: {{ .Values.nameSpace.rQ.reqCpu }}
+     requests.memory: {{ .Values.nameSpace.rQ.reqMem }}
+     limits.cpu: {{ .Values.nameSpace.rQ.limCpu }}
+     limits.memory: {{ .Values.nameSpace.rQ.limMem }} 
+     pods: {{ .Values.nameSpace.rQ.pods }}  
+     secrets: {{ .Values.nameSpace.rQ.secrets }}   
+     services: {{ .Values.nameSpace.rQ.services }} 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
@@ -25,6 +63,13 @@ spec:
       labels:
         app: rates
     spec:
+      initContainers:
+        - name: rates-initdb
+          image: busybox:1.31
+          env:
+             - name: DB
+               value: {{ .Values.dbService.name }}
+          command: ['sh', '-c', 'echo -e "Checking for the availability of RDS Postgres DB"; while ! nc -z $DB 5432; do sleep 1; printf "Waiting for RDS postgres to come online on port 5432"; done; echo -e "RDS Postgres DB Server is available and listening on 5432";']
       containers:
         - name: rates-container
           image: {{ .Values.deployment.containers.image }}
@@ -42,6 +87,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.name }}
                   key: rates_db_password
-
-            
-            
+          readinessProbe: # Probe describes a health check to be performed against a container to determine whether it is alive or ready to receive traffic.
+            exec:
+              command: # 
+                - /bin/sh
+                - -c
+                - nc -z localhost 3000
+            initialDelaySeconds: {{ .Values.deployment.probe.delay }} # Number of seconds after the container has started before liveness probes are initiated
+            periodSeconds: {{ .Values.deployment.probe.interval }} # How often (in seconds) to perform the probe.
+            timeoutSeconds: {{ .Values.deployment.probe.timeout }} # Number of seconds after which the probe times out
+            failureThreshold: {{ .Values.deployment.probe.failthreshold }} # Minimum consecutive failures for the probe to be considered failed after having succeeded.
+            successThreshold: {{ .Values.deployment.probe.successthreshold }} # Minimum consecutive successes for the probe to be considered successful after having faileds

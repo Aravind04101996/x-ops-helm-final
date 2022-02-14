@@ -25,3 +25,7 @@ data "aws_security_group" "public_sg" {
   provider = aws
 }
 
+data "aws_ssm_parameter" "dbpwd" {
+  name = "/rds/encoded/dbpwd"
+  provider = aws
+}
