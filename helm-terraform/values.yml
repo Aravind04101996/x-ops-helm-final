@@ -1,0 +1,35 @@
+nameSpace:
+  name: rates
+
+secrets:
+  name: rates-db-secret
+  dbpwd: VGd1eWFzZGluYWRtbjYzNjI=
+
+nodeService:
+  name: rates-service
+  port: 3000
+
+dbService:
+  name: rates-db-service
+
+deployment:
+  name: rates-deployment
+  dbUser: postgres
+  dbName: rates
+  replicas: 3
+
+ingress:
+  name: xeneta-rates-service
+  albName: xeneta-rates-alb
+  albScheme: internet-facing
+  listenerPort: '[{"HTTP": 80}]'
+  targetType: instance
+  protocol: HTTP
+  hcPort: traffic-port
+  hcProtocol: HTTP
+  hcPath: /
+  hcinterval: '30'
+  hctimeout: '10'
+  hchthreshold: '3'
+  hcuhthreshold: '3'
+  successCode: '200'
