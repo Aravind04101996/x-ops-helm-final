@@ -4,7 +4,9 @@ This repository contains 2 helm charts which are listed below. <br/>
 - ALB Ingress Controller Helm Chart <br/>
 - Xeneta Application Helm Chart <br/>
 
-Helm charts are deployed into AWS EKS Cluster through Terraform using github ci actions.
+Helm charts are deployed into AWS EKS Cluster through Terraform using github ci actions. <br/>
+
+Note: This is continuation of x-ops-terraform-final repository. <br/>
 
 ## Repository Information
 
