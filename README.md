@@ -11,7 +11,7 @@ Note: This is continuation of x-ops-terraform-final repository. <br/>
 ## Repository Information
 
 ```
-- .github/workflows/* - github CI workflow to deploy infra in AWS.
+- .github/workflows/* - github CI workflow to deploy helm charts into AWS EKS Cluster.
 
 - helm-charts/charts 
     - k8s-alb-ingress-controller/* - Helm chart to deploy ALB Ingress Controller in K8s. 
